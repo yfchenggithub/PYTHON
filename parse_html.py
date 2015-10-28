@@ -9,7 +9,8 @@ tem = (sys.argv[0].split("/"))
 script_name = tem[len(tem) - 1]
 
 def usage():
-	print("%s -i infile -o outfile" % script_name)
+	print("%s -i infile" % script_name)
+	print("outfile format: infile.out")
 
 opts, args = getopt.getopt(sys.argv[1:], "hi:o:")
 input_file = ""
@@ -18,8 +19,6 @@ output_file = ""
 for op,value in opts:
 	if op == "-i":
 		input_file = value
-	elif op == "-o":
-		output_file = value
 	elif op == "-h":
 		usage()
 		sys.exit()
@@ -27,12 +26,14 @@ for op,value in opts:
 		usage()
 		sys.exit()
 
+output_file = input_file + ".out"
+
 pic_re = "jpg|png|svg|jpeg|gif"
 video_re = "swf"
-txt_re = "html|css|js"
-reobj = re.compile(r'.*?(http://.*?(%s.*?|%s.*?|%s.*?)).*?' % (pic_re, txt_re, video_re), re.S)
-result_file = open(output_file, 'w+')
+txt_re = "html|css|js|htm|shtml"
+reobj = re.compile(r'.*?"(http://(\w+\.)+[^"]*?(%s|%s|%s))".*?' % (pic_re, txt_re, video_re), re.S)
 
+result_file = open(output_file, 'w+')
 if os.path.exists(input_file):
 	_file = open(input_file)
 	lines = _file.readlines()
@@ -40,6 +41,7 @@ if os.path.exists(input_file):
 	_file.close()
 	for line in lines:
 		for match in reobj.finditer(line):
+			#result_file.write(line)
 			result_file.write(match.group(1).strip())
 			result_file.write('\n')
 	result_file.close()
